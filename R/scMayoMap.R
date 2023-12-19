@@ -211,7 +211,7 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
 #' obj <- scMayoMap(data = data, tissue = 'muscle')
 #' plt <- scMayoMap.plot(scMayoMap.object = obj, directory = '~/Desktop/', width = 8, height = 6)
 
-scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height = 6){
+scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height = 6, x.fontSize=7, y.fontSize=7){
   annotation.mean <- scMayoMap.object$annotation.mean
   annotation.norm <- scMayoMap.object$annotation.norm
   top.n <- scMayoMap.object$res
@@ -244,24 +244,24 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
     score2 <- mt.annotation %>% left_join(tmp.df2 %>% mutate(match = 't'), by = c('cluster','cell'))
     score2$score[is.na(score2$match)] <- NA
     score2 <- score2[,!(colnames(score2) %in% 'match')]
-    score2$cluster <- as.numeric(score2$cluster)
+    #score2$cluster <- as.numeric(score2$cluster)
     plot.top = 2
   }
 
-  mt.annotation$cluster <- as.numeric(gsub('Cluster ','', mt.annotation$cluster))
-  score1$cluster <- as.numeric(gsub('Cluster ','', score1$cluster))
+  #mt.annotation$cluster <- as.numeric(gsub('Cluster ','', mt.annotation$cluster))
+  #score1$cluster <- as.numeric(gsub('Cluster ','', score1$cluster))
   ord <- unique((mt.annotation %>% group_by(cluster) %>% dplyr::slice_max(score, n=2))$cell)
   mt.annotation <- within(mt.annotation, cell <- factor(cell, levels= ord))
   score1 <- within(score1, cell <- factor(cell, levels= ord))
   suppressMessages(annotation.plot <- ggplot() +
                      geom_point(data = mt.annotation, aes(x=cluster,y=cell, size=score, color = score), shape =20) +
                      scale_color_continuous(type = "viridis") +
-                     scale_x_continuous(breaks = seq(0, max(mt.annotation$cluster), by = 1)) +
+                     #scale_x_continuous(breaks = seq(0, max(mt.annotation$cluster), by = 1)) +
                      geom_point(data = score1, aes(x=cluster,y=cell, size=score), shape = 21, color = 'red') +
                      theme_bw() +
                      labs(title= "", x="cluster", y="", caption = "Dot size also represents the score\nRed circle highlights top1 score\n Blue circle notates the 2nd top score") +
-                     theme(axis.text = element_text(color = 'black', size = 14),
-                           axis.text.x = element_text(color = 'black', size = 14),
+                     theme(axis.text = element_text(color = 'black', size = y.fontSize),
+                           axis.text.x = element_text(color = 'black', size = x.fontSize, angle = 30, vjust = 0.85, hjust = 0.75),
                            axis.title = element_text(color = 'black', size = 14),
                            legend.title = element_text(color = 'black', size = 14),
                            legend.text = element_text(color = 'black', size = 14),
@@ -273,9 +273,9 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
   }
 
   suppressMessages(print(annotation.plot))
-  if(is.null(directory)){directory <- getwd()}
-  ggsave(paste0(directory, '/annotation.pdf'), width = width, height = height)
-
+  if(is.null(directory)){
+    ggsave(paste0(directory, '/annotation.pdf'), width = width, height = height)
+  }
   return(annotation.plot)
 }
 
