@@ -271,8 +271,6 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
   if(plot.top == 2){
     annotation.plot <- annotation.plot +geom_point(data = score2, aes(x=cluster,y=cell, size=score), shape = 21, color = 'blue')
   }
-
-  suppressMessages(print(annotation.plot))
   if(!is.null(directory)){
     ggsave(paste0(directory, '/annotation.pdf'), width = width, height = height)
   }
