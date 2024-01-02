@@ -273,7 +273,7 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
   }
 
   suppressMessages(print(annotation.plot))
-  if(is.null(directory)){
+  if(!is.null(directory)){
     ggsave(paste0(directory, '/annotation.pdf'), width = width, height = height)
   }
   return(annotation.plot)
